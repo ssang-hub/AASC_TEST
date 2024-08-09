@@ -30,8 +30,6 @@ export default function useFetchApi({
       const resp = await api(path + query);
 
       if (resp.hasOwnProperty("result")) {
-        console.log(resp.result);
-
         setData(resp.result);
       }
     } catch (e) {

@@ -14,29 +14,36 @@ This is a web application project that lists employees from Bitrix24.
 git clone  https://github.com/ssang-hub/AASC_TEST.git <project_name>
 ```
 
-- Install dependencies
+- Install dependencies on server
 
 ```
 cd <project_name>
 ```
 
 ```
-yarn install
+cd backend && yarn install
 ```
 
-- Change files `.env.example` to `.env`
-- Update the `REACT_APP_ACCESSTOKEN` variable in the `.env` file  to match the `token` retrieved from
+- Install dependencies on client
 
 ```
-https://bx-oauth2.aasc.com.vn/bx/oauth2_token/local.66b40399de0b85.69000599
+cd ../client && yarn install
 ```
+
+- Rename all the `.env.example` files to `.env`
 
 ## Running the Application
+
+- Run backend
+
+```
+cd backend && yarn start
+```
 
 - Run client
 
 ```
-yarn start
+cd client && yarn start
 ```
 
 Your application will be available at http://localhost:3000.

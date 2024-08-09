@@ -7,12 +7,7 @@ function Employees() {
     data: employees,
     loading: isLoading,
     refetchApi,
-  } = useFetchApi({
-    url: process.env.REACT_APP_BASE_URL,
-    initQueries: {
-      auth: process.env.REACT_APP_ACCESSTOKEN,
-    },
-  });
+  } = useFetchApi({ url: process.env.REACT_APP_BITRIX24_URL });
   const [highlightedEmployee, setHighlightedEmployee] = useState(null);
 
   const onHighlightEmployee = (id) => {

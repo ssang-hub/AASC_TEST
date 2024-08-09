@@ -1,8 +1,6 @@
 import React from "react";
 
 function EmployeeInfo({ highlightedEmployee }) {
-  console.log(highlightedEmployee);
-
   return (
     <div
       className="modal fade"
