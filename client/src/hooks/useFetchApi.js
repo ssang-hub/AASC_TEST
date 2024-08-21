@@ -27,11 +27,8 @@ export default function useFetchApi({
       const path = apiUrl || url;
       const separateChar = path.includes("?") ? "&" : "?";
       const query = params ? separateChar + queryString.stringify(params) : "";
-      const resp = await api(path + query);
-
-      if (resp.hasOwnProperty("result")) {
-        setData(resp.result);
-      }
+      const data = await api(path + query);
+      setData(data);
     } catch (e) {
       console.log(e);
     } finally {

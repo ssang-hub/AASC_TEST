@@ -5,6 +5,7 @@ This is a web application project that lists employees from Bitrix24.
 ## Prerequisites
 
 - Install [Node.js](https://nodejs.org/en/) version 20.x.x
+- Install [Ngrok](https://ngrok.com/download) version 3.x.x
 
 ## Installation & Configuration
 
@@ -47,3 +48,13 @@ cd client && yarn start
 ```
 
 Your application will be available at http://localhost:3000.
+
+## Set up Bitrix24 OAuth
+
+- Run ngrok
+
+```
+ngrok http 3001
+```
+
+- Update `Initial installation path` field with the `<your_ngrok_domain>/install_app` and then click on the 'reinstall/install' button.
