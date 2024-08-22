@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import useFetchApi from '../../hooks/useFetchApi';
 import useDeleteApi from '../../hooks/useDeleteApi';
 import EditContact from './EditContact';
@@ -7,7 +7,8 @@ import Placeholder from '../placeholders/Placeholder';
 
 function Contacts() {
   const { data: contacts, loading, refetchApi, setData } = useFetchApi({ url: '/contact' });
-  const { handleDelete } = useDeleteApi({ url: '/contact' });
+  const { handleDelete, deleting } = useDeleteApi({ url: '/contact' });
+  const shouldUpdateRef = useRef(true);
   const [contactSelected, setContactSelected] = useState({
     NAME: '',
     LAST_NAME: '',
@@ -18,15 +19,17 @@ function Contacts() {
 
   const onDeleteContact = async (contactId) => {
     await handleDelete({ contactId });
-    setData((prev) => prev.filter((item) => item.ID !== contactId));
+    setData((prev) => prev.filter((contact) => contact.ID !== contactId));
   };
 
   const onSelectContact = (id) => {
     setContactSelected(contacts.find((contact) => contact.ID === id));
+    shouldUpdateRef.current = true;
   };
 
   const onCreateContact = () => {
     setContactSelected({});
+    shouldUpdateRef.current = true;
   };
 
   return (
@@ -70,36 +73,36 @@ function Contacts() {
                   <p className="fw-normal mb-1">
                     {contact.NAME} {contact.LAST_NAME}
                   </p>
-                  {contact.EMAIL?.map((item) => (
-                    <p className="text-muted mb-0">{item.VALUE}</p>
+                  {contact.EMAIL?.map((element) => (
+                    <p className="text-muted mb-0">{element.VALUE}</p>
                   ))}
                 </td>
                 <td colSpan={2}>
-                  {contact.address?.map((item) => (
+                  {contact.address?.map((element) => (
                     <div>
                       <p className="fw-normal mb-1">
-                        {[item.ADDRESS_1, item.REGION, item.CITY]
-                          .filter((item) => item !== undefined && item !== null)
+                        {[element.ADDRESS_1, element.REGION, element.CITY]
+                          .filter((element) => element !== undefined && element !== null)
                           .join(', ')}
                       </p>
                     </div>
                   ))}
                 </td>
                 <td>
-                  {contact.PHONE?.map((item) => (
-                    <div>{item.VALUE}</div>
+                  {contact.PHONE?.map((element) => (
+                    <div>{element.VALUE}</div>
                   ))}
                 </td>
                 <td>
-                  {contact.WEB?.map((item) => (
-                    <div>{item.VALUE}</div>
+                  {contact.WEB?.map((element) => (
+                    <div>{element.VALUE}</div>
                   ))}
                 </td>
                 <td>
-                  {contact.bankInfo?.map((item) => (
+                  {contact.bankInfo?.map((element) => (
                     <div>
-                      <p className="fw-normal mb-1">{item.RQ_ACC_NUM}</p>
-                      <p className="text-muted mb-0">{item.RQ_BANK_NAME}</p>
+                      <p className="fw-normal mb-1">{element.RQ_ACC_NUM}</p>
+                      <p className="text-muted mb-0">{element.RQ_BANK_NAME}</p>
                     </div>
                   ))}
                 </td>
@@ -120,8 +123,13 @@ function Contacts() {
                     data-toggle="modal"
                     data-target="#deleteContact"
                     onClick={() => onSelectContact(contact.ID)}
+                    disabled={deleting}
                   >
-                    <i className="fa-solid fa-trash"></i>
+                    {deleting ? (
+                      <div className="spinner-border text-light spinner-border-sm" role="status"></div>
+                    ) : (
+                      <i className="fa-solid fa-trash"></i>
+                    )}
                   </button>
                 </td>
               </tr>
@@ -129,7 +137,7 @@ function Contacts() {
           )}
         </tbody>
       </table>
-      <EditContact contact={contactSelected} setContact={setContactSelected} />
+      <EditContact contact={contactSelected} setContact={setContactSelected} shouldUpdateRef={shouldUpdateRef} />
       {contactSelected && <ConfirmDialog contact={contactSelected} onDeleteContact={onDeleteContact} />}
     </div>
   );

@@ -4,17 +4,20 @@ import useEditApi from '../../hooks/useEditApi';
 import EditAddress from './EditAddress';
 import EditBankInfo from './EditBankInfo';
 
-import { contactFields, addressTypesValue } from '../../const/default';
+import { contactFields, addressTypesValue, defaultContactField } from '../../const/default';
 import style from './style.module.scss';
 import { v4 as uuidv4 } from 'uuid';
 
-function EditContact({ contact = { NAME: '', LAST_NAME: '', EMAIL: [] }, setContact }) {
+function EditContact({ contact = { NAME: '', LAST_NAME: '', EMAIL: [] }, setContact, shouldUpdateRef }) {
   const [uniqueAddress, setUniqueAddress] = useState(contact.address?.map((address) => address.TYPE_ID) || []);
   const { handleCreate, creating } = useCreateApi({ url: '/contact' });
   const { handleEdit, editing } = useEditApi({ url: '/contact' });
 
   useEffect(() => {
-    setUniqueAddress(contact.address?.map((address) => address.TYPE_ID) || []);
+    if (shouldUpdateRef.current) {
+      setUniqueAddress(contact.address?.map((address) => address.TYPE_ID) || []);
+      shouldUpdateRef.current = false;
+    }
   }, [contact]);
 
   /**
@@ -25,17 +28,22 @@ function EditContact({ contact = { NAME: '', LAST_NAME: '', EMAIL: [] }, setCont
    */
   const onChangeContactData = ({ action = 'add', fieldName, fieldId = '', data = {} }) => {
     if (action === 'add') {
-      setContact((prev) => ({ ...prev, [fieldName]: [...(prev[fieldName] || []), { ID: uuidv4(), ...data }] }));
+      setContact((prev) => ({
+        ...prev,
+        [fieldName]: [...(prev[fieldName] || []), { ID: uuidv4(), ...data, ...defaultContactField[fieldName] }],
+      }));
     } else if (action === 'update') {
       if (fieldName === 'NAME' || fieldName === 'LAST_NAME') {
         setContact((prev) => ({ ...prev, ...data }));
       } else
         setContact((prev) => ({
           ...prev,
-          [fieldName]: prev[fieldName].map((fieldItem) => (fieldItem.ID === fieldId ? { ...fieldItem, ...data } : fieldItem)),
+          [fieldName]: prev[fieldName].map((fieldElement) =>
+            fieldElement.ID === fieldId ? { ...fieldElement, ...data } : fieldElement,
+          ),
         }));
     } else if (action === 'delete') {
-      setContact((prev) => ({ ...prev, [fieldName]: prev[fieldName].filter((fieldItem) => fieldItem.ID !== fieldId) }));
+      setContact((prev) => ({ ...prev, [fieldName]: prev[fieldName].filter((fieldElement) => fieldElement.ID !== fieldId) }));
     }
   };
 
@@ -53,8 +61,8 @@ function EditContact({ contact = { NAME: '', LAST_NAME: '', EMAIL: [] }, setCont
     }
   };
 
-  const fieldElement = (contact, item) => {
-    return contact[item.fieldName]?.map((fieldData) => (
+  const contactElement = (contact, element) => {
+    return contact[element.fieldName]?.map((fieldData) => (
       <div>
         <td className="form-outline">
           <input
@@ -64,7 +72,7 @@ function EditContact({ contact = { NAME: '', LAST_NAME: '', EMAIL: [] }, setCont
             onChange={(e) =>
               onChangeContactData({
                 action: 'update',
-                fieldName: item.fieldName,
+                fieldName: element.fieldName,
                 fieldId: fieldData.ID,
                 data: { VALUE: e.target.value },
               })
@@ -78,13 +86,13 @@ function EditContact({ contact = { NAME: '', LAST_NAME: '', EMAIL: [] }, setCont
             onChange={(e) =>
               onChangeContactData({
                 action: 'update',
-                fieldName: item.fieldName,
+                fieldName: element.fieldName,
                 fieldId: fieldData.ID,
                 data: { VALUE_TYPE: e.target.value },
               })
             }
           >
-            {item.options.map((option) => (
+            {element.options.map((option) => (
               <option className="dropdown-item" value={option} href="#">
                 {option}
               </option>
@@ -94,7 +102,7 @@ function EditContact({ contact = { NAME: '', LAST_NAME: '', EMAIL: [] }, setCont
         <td>
           <div
             className={`btn ${style['btn-add-data']}`}
-            onClick={() => onChangeContactData({ action: 'delete', fieldName: item.fieldName, fieldId: fieldData.ID })}
+            onClick={() => onChangeContactData({ action: 'delete', fieldName: element.fieldName, fieldId: fieldData.ID })}
           >
             <i className="fa-solid fa-trash text-info"></i>
           </div>
@@ -160,24 +168,24 @@ function EditContact({ contact = { NAME: '', LAST_NAME: '', EMAIL: [] }, setCont
                       />
                     </td>
                   </tr>
-                  {contactFields.map((item) => (
+                  {contactFields.map((element) => (
                     <tr>
                       <th scope="row">
-                        <div>{item.title}</div>
+                        <div>{element.title}</div>
                         <button
                           className={`btn ${style['btn-add-data']} ml-2`}
                           onClick={() =>
                             onChangeContactData({
                               action: 'add',
-                              fieldName: item.fieldName,
-                              data: { VALUE_TYPE: item.options[0] },
+                              fieldName: element.fieldName,
+                              data: { VALUE_TYPE: element.options[0] },
                             })
                           }
                         >
                           +
                         </button>
                       </th>
-                      {fieldElement(contact, item)}
+                      {contactElement(contact, element)}
                     </tr>
                   ))}
                   <tr>
@@ -192,7 +200,13 @@ function EditContact({ contact = { NAME: '', LAST_NAME: '', EMAIL: [] }, setCont
                       </button>
                     </th>
                     {contact.address?.map((address) =>
-                      EditAddress({ addressData: address, onChangeContactData, setUniqueAddress, uniqueAddress }),
+                      EditAddress({
+                        addressData: address,
+                        onChangeContactData,
+                        setUniqueAddress,
+                        uniqueAddress,
+                        shouldUpdateRef: shouldUpdateRef,
+                      }),
                     )}
                   </tr>
                   <tr>
@@ -218,13 +232,7 @@ function EditContact({ contact = { NAME: '', LAST_NAME: '', EMAIL: [] }, setCont
               disabled={creating || editing}
               onClick={() => onSubmitContact()}
             >
-              {creating || editing ? (
-                <div className="spinner-border text-info spinner-border-sm" role="status">
-                  <span className="sr-only">Loading...</span>
-                </div>
-              ) : (
-                'Save'
-              )}
+              {creating || editing ? <div className="spinner-border text-info spinner-border-sm" role="status"></div> : 'Save'}
             </button>
             <button type="button" className="btn btn-secondary" data-dismiss="modal">
               Close

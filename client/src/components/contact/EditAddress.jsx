@@ -1,7 +1,7 @@
 import style from './style.module.scss';
 import { addressTypesValue } from '../../const/default';
 
-function EditAddress({ addressData, onChangeContactData, setUniqueAddress, uniqueAddress }) {
+function EditAddress({ addressData, onChangeContactData, setUniqueAddress, uniqueAddress, shouldUpdateRef }) {
   const handleUpdateAddressTypeId = (addressData, value) => {
     onChangeContactData({
       action: 'update',
@@ -9,10 +9,11 @@ function EditAddress({ addressData, onChangeContactData, setUniqueAddress, uniqu
       fieldId: addressData.ID,
       data: { TYPE_ID: value },
     });
+    shouldUpdateRef.current = true;
   };
 
   const handleDeleteAddress = (TYPE_ID, ID) => {
-    setUniqueAddress((prev) => prev.filter((item) => item !== TYPE_ID));
+    setUniqueAddress((prev) => prev.filter((element) => element !== TYPE_ID));
     onChangeContactData({ action: 'delete', fieldName: 'address', fieldId: ID });
   };
 
@@ -48,7 +49,7 @@ function EditAddress({ addressData, onChangeContactData, setUniqueAddress, uniqu
               data: { CITY: e.target.value },
             })
           }
-          value={addressData.CITY || ''}
+          value={addressData.CITY}
           placeholder="city"
         />
       </td>
@@ -64,7 +65,7 @@ function EditAddress({ addressData, onChangeContactData, setUniqueAddress, uniqu
               data: { REGION: e.target.value },
             })
           }
-          value={addressData.REGION || ''}
+          value={addressData.REGION}
           placeholder="district"
         />
       </td>
@@ -80,7 +81,7 @@ function EditAddress({ addressData, onChangeContactData, setUniqueAddress, uniqu
               data: { ADDRESS_1: e.target.value },
             })
           }
-          value={addressData.ADDRESS_1 || ''}
+          value={addressData.ADDRESS_1}
           placeholder="street"
         />
       </td>

@@ -3,6 +3,7 @@ import { handleDataUpdateContact } from '../services/contactService';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
+ * This is the example API for exercise 1
  * @param req
  * @param res
  * @return {Promise<any>}
@@ -32,23 +33,30 @@ export const getAllContact = async (req, res) => {
       }),
     ]);
 
-    const requisiteData = contactRequisites.map((item) => {
-      const bankInfo = contactBankDetail.filter((bankItem) => bankItem.ENTITY_ID === item.ID);
-      const address = contactAddress.filter((addr) => addr.ENTITY_ID === item.ID).map((item) => ({ ...item, ID: uuidv4() }));
-      return { ...item, bankInfo, address };
+    const requisiteData = contactRequisites.map((element) => {
+      const bankInfo = contactBankDetail.filter((bankInfoElement) => bankInfoElement.ENTITY_ID === element.ID);
+      const address = contactAddress
+        .filter((addr) => addr.ENTITY_ID === element.ID)
+        .map((addressElement) => ({ ...addressElement, ID: uuidv4() }));
+      return { ...element, bankInfo, address };
     });
 
-    const respData = contacts.map((contact) => {
-      const requisiteItem = requisiteData.find((requisite) => requisite.ENTITY_ID === contact.ID);
-      if (!requisiteItem) {
-        return contact;
+    const respData = contacts.map((contactElement) => {
+      const requisiteElement = requisiteData.find((requisite) => requisite.ENTITY_ID === contactElement.ID);
+      if (!requisiteElement) {
+        return contactElement;
       }
-      return { ...contact, requisiteId: requisiteItem.ID, address: requisiteItem.address, bankInfo: requisiteItem.bankInfo };
+      return {
+        ...contactElement,
+        requisiteId: requisiteElement.ID,
+        address: requisiteElement.address,
+        bankInfo: requisiteElement.bankInfo,
+      };
     });
 
     res.status(200).json(respData);
   } catch (error) {
-    res.status(500).send(`Error: ${error.message}`);
+    res.status(500).json({ msg: 'Unable to fetch data' });
   }
 };
 
@@ -77,24 +85,24 @@ export const createContact = async (req, res) => {
       });
 
       await Promise.all([
-        address?.map((item) =>
+        address?.map((element) =>
           api('crm.address.add', {
             body: {
               fields: {
                 ENTITY_TYPE_ID: 8,
                 ENTITY_ID: requisiteId,
-                ...item,
+                ...element,
               },
             },
           }),
         ),
-        bankInfo?.map((item) =>
+        bankInfo?.map((element) =>
           api('crm.requisite.bankdetail.add', {
             body: {
               fields: {
                 ENTITY_ID: requisiteId,
                 NAME: 'Bank details',
-                ...item,
+                ...element,
               },
             },
           }),

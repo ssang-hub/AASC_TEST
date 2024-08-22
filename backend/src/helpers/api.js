@@ -31,6 +31,9 @@ const crateClient = () => {
         };
         return axios(prevRequest);
       }
+      if (error.response.status === 408) {
+        return new Error(' Request Timeout');
+      }
     },
   );
 
@@ -58,7 +61,7 @@ const createApi = () => {
 };
 
 /**
- * @return {Promise<string>}
+ * @return {Promise<any>}
  */
 const refreshToken = async () => {
   try {
@@ -76,7 +79,7 @@ const refreshToken = async () => {
     updateToken({ access_token, refresh_token });
     return access_token;
   } catch (error) {
-    console.log(error);
+    return error;
   }
 };
 

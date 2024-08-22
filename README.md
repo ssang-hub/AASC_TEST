@@ -1,6 +1,6 @@
 # Getting Started
 
-This is a web application project that lists employees from Bitrix24.
+This project involves OAuth configuration and contact management.
 
 ## Prerequisites
 
@@ -33,12 +33,32 @@ cd ../client && yarn install
 
 - Rename all the `.env.example` files to `.env`
 
+## Set up Bitrix24 OAuth
+
+- Run backend
+
+```
+cd backend && yarn dev
+```
+
+- Run ngrok
+
+```
+ngrok http 3001
+```
+
+- Update `Initial installation path` field on the local application with the `<your_ngrok_domain>/install_app` and then click on the `reinstall/install` button.
+
+The token will be added to the `tokens.json` file
+
+- You can replace the values in the `.env` file with the values in `your local application`
+
 ## Running the Application
 
 - Run backend
 
 ```
-cd backend && yarn start
+cd backend && yarn dev
 ```
 
 - Run client
@@ -48,13 +68,3 @@ cd client && yarn start
 ```
 
 Your application will be available at http://localhost:3000.
-
-## Set up Bitrix24 OAuth
-
-- Run ngrok
-
-```
-ngrok http 3001
-```
-
-- Update `Initial installation path` field with the `<your_ngrok_domain>/install_app` and then click on the 'reinstall/install' button.

@@ -1,4 +1,10 @@
 import { object, string, array } from 'yup';
+
+/**
+ * @param req
+ * @param res
+ * @return {Promise<any>}
+ */
 export async function contactInputMiddleware(req, res, next) {
   try {
     const contactData = req.body.data;

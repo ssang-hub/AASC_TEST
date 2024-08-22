@@ -18,3 +18,12 @@ export const addressTypesValue = [
   { TYPE_ID: '4', VALUE: 'Registered address' },
   { TYPE_ID: '9', VALUE: 'Beneficiary address' },
 ];
+export const defaultContactField = {
+  NAME: '',
+  LAST_NAME: '',
+  EMAIL: { VALUE_TYPE: 'Work', VALUE: '' },
+  WEB: { VALUE_TYPE: 'Corporate', VALUE: '' },
+  PHONE: { VALUE_TYPE: 'Work Phone', VALUE: '' },
+  address: { CITY: '', ADDRESS_1: '', REGION: '' },
+  bankInfo: { RQ_BANK_NAME: '', RQ_ACC_NUM: '' },
+};
